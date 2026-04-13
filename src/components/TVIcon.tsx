@@ -81,20 +81,12 @@ export function TVIcon({
         if (!isDragging) onSelect();
       }}
     >
-      <div className={`relative p-1.5 rounded-full border-2 border-white shadow-lg ${getStatusColor(tv.status)} ${
+      <div className={`relative p-1 rounded-full border-2 border-white shadow-lg ${getStatusColor(tv.status)} ${
         isDragging ? 'shadow-xl' : ''
       }`}>
-        <Tv className="h-4 w-4" />
+        <Tv className="h-1 w-1" />
         
-        {/* Status indicator */}
-        <div
-          className={`absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border border-white ${
-            tv.status.toLowerCase() === 'online' ? 'bg-green-500' :
-            tv.status.toLowerCase() === 'offline' ? 'bg-red-500' :
-            tv.status.toLowerCase() === 'warning' ? 'bg-yellow-500' :
-            'bg-gray-500'
-          }`}
-        />
+       
       </div>
 
       {/* Tooltip */}

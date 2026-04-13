@@ -1,5 +1,5 @@
-// src/lib/supabase.ts
-// ⚠️ Este archivo ya NO usa Supabase — apunta a tu API Express local
+// src/lib/api.ts
+// Reemplaza el cliente de Supabase — apunta a tu servidor Express local
 
 const BASE_URL = "http://localhost:3000";
 
@@ -24,11 +24,13 @@ async function request<T>(
 
 export const floorPlansApi = {
   getAll: () => request<FloorPlan[]>("/floor_plans"),
+
   create: (name: string, image_url: string) =>
     request<FloorPlan>("/floor_plans", {
       method: "POST",
       body: JSON.stringify({ name, image_url }),
     }),
+
   delete: (id: string) =>
     request(`/floor_plans/${id}`, { method: "DELETE" }),
 };
@@ -40,16 +42,19 @@ export const floorPlansApi = {
 export const printersApi = {
   getByFloorPlan: (floor_plan_id: string) =>
     request<Printer[]>(`/printers?floor_plan_id=${floor_plan_id}`),
+
   create: (data: Partial<Printer>) =>
     request<Printer>("/printers", {
       method: "POST",
       body: JSON.stringify(data),
     }),
+
   update: (id: string, data: Partial<Printer>) =>
     request<Printer>(`/printers/${id}`, {
       method: "PUT",
       body: JSON.stringify(data),
     }),
+
   delete: (id: string) =>
     request(`/printers/${id}`, { method: "DELETE" }),
 };
@@ -61,16 +66,19 @@ export const printersApi = {
 export const computersApi = {
   getByFloorPlan: (floor_plan_id: string) =>
     request<Computer[]>(`/computers?floor_plan_id=${floor_plan_id}`),
+
   create: (data: Partial<Computer>) =>
     request<Computer>("/computers", {
       method: "POST",
       body: JSON.stringify(data),
     }),
+
   update: (id: string, data: Partial<Computer>) =>
     request<Computer>(`/computers/${id}`, {
       method: "PUT",
       body: JSON.stringify(data),
     }),
+
   delete: (id: string) =>
     request(`/computers/${id}`, { method: "DELETE" }),
 };
@@ -82,16 +90,19 @@ export const computersApi = {
 export const tvsApi = {
   getByFloorPlan: (floor_plan_id: string) =>
     request<TV[]>(`/tvs?floor_plan_id=${floor_plan_id}`),
+
   create: (data: Partial<TV>) =>
     request<TV>("/tvs", {
       method: "POST",
       body: JSON.stringify(data),
     }),
+
   update: (id: string, data: Partial<TV>) =>
     request<TV>(`/tvs/${id}`, {
       method: "PUT",
       body: JSON.stringify(data),
     }),
+
   delete: (id: string) =>
     request(`/tvs/${id}`, { method: "DELETE" }),
 };
@@ -102,22 +113,25 @@ export const tvsApi = {
 
 export const inventoryApi = {
   getAll: () => request<InventoryDevice[]>("/inventory"),
+
   create: (data: Partial<InventoryDevice>) =>
     request<InventoryDevice>("/inventory", {
       method: "POST",
       body: JSON.stringify(data),
     }),
+
   update: (id: string, data: Partial<InventoryDevice>) =>
     request<InventoryDevice>(`/inventory/${id}`, {
       method: "PUT",
       body: JSON.stringify(data),
     }),
+
   delete: (id: string) =>
     request(`/inventory/${id}`, { method: "DELETE" }),
 };
 
 // ─────────────────────────────────────────────
-// TIPOS
+// TIPOS (copiados de lib/supabase.ts y hooks)
 // ─────────────────────────────────────────────
 
 export interface FloorPlan {
@@ -139,13 +153,6 @@ export interface Printer {
   y_position: number;
   created_at: string;
   updated_at: string;
-}
-
-export interface PrinterFormData {
-  name: string;
-  model: string;
-  toner: string;
-  status: string;
 }
 
 export interface Computer {

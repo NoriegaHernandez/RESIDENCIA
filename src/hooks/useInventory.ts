@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { inventoryApi } from '../lib/supabase';
+
 
 export interface InventoryDevice {
   id: string;
@@ -55,75 +56,52 @@ export function useInventory() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchDevices = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('inventory')
-        .select('*')
-        .order('registration_date', { ascending: false });
+const fetchDevices = async () => {
+  try {
+    setLoading(true);
+    const data = await inventoryApi.getAll();
+    setDevices(data || []);
+  } catch (err) {
+    setError(err instanceof Error ? err.message : 'Failed to fetch inventory');
+  } finally {
+    setLoading(false);
+  }
+};
 
-      if (error) throw error;
-      setDevices(data || []);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch inventory');
-    } finally {
-      setLoading(false);
-    }
-  };
+const createDevice = async (deviceData: InventoryFormData) => {
+  try {
+    const data = await inventoryApi.create(deviceData);
 
-  const createDevice = async (deviceData: InventoryFormData) => {
-    try {
-      const { data, error } = await supabase
-        .from('inventory')
-        .insert([deviceData])
-        .select()
-        .single();
+    setDevices(prev => [data, ...prev]);
+    return data;
+  } catch (err) {
+    setError(err instanceof Error ? err.message : 'Failed to create device');
+    throw err;
+  }
+};
 
-      if (error) throw error;
-      
-      setDevices(prev => [data, ...prev]);
-      return data;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create device');
-      throw err;
-    }
-  };
+const updateDevice = async (id: string, updates: Partial<InventoryDevice>) => {
+  try {
+    const data = await inventoryApi.update(id, updates);
 
-  const updateDevice = async (id: string, updates: Partial<InventoryDevice>) => {
-    try {
-      const { data, error } = await supabase
-        .from('inventory')
-        .update(updates)
-        .eq('id', id)
-        .select()
-        .single();
+    setDevices(prev => prev.map(d => d.id === id ? data : d));
+    return data;
+  } catch (err) {
+    setError(err instanceof Error ? err.message : 'Failed to update device');
+    throw err;
+  }
+};
 
-      if (error) throw error;
-      
-      setDevices(prev => prev.map(d => d.id === id ? data : d));
-      return data;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update device');
-      throw err;
-    }
-  };
+const deleteDevice = async (id: string) => {
+  try {
+    await inventoryApi.delete(id);
 
-  const deleteDevice = async (id: string) => {
-    try {
-      const { error } = await supabase
-        .from('inventory')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-      
-      setDevices(prev => prev.filter(d => d.id !== id));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete device');
-      throw err;
-    }
-  };
+    setDevices(prev => prev.filter(d => d.id !== id));
+  } catch (err) {
+    setError(err instanceof Error ? err.message : 'Failed to delete device');
+    throw err;
+  }
+};
 
   useEffect(() => {
     fetchDevices();

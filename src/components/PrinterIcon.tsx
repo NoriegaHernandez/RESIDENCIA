@@ -81,20 +81,13 @@ export function PrinterIcon({
         if (!isDragging) onSelect();
       }}
     >
-      <div className={`relative p-1.5 rounded-full border-2 border-white shadow-lg ${getStatusColor(printer.status)} ${
+      <div className={`relative p-1 rounded-full border-2 border-white shadow-lg ${getStatusColor(printer.status)} ${
         isDragging ? 'shadow-xl' : ''
       }`}>
         <PrinterIconSvg className="h-1 w-1" />
         
         {/* Status indicator */}
-        <div
-          className={`absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border border-white ${
-            printer.status.toLowerCase() === 'online' ? 'bg-green-500' :
-            printer.status.toLowerCase() === 'offline' ? 'bg-red-500' :
-            printer.status.toLowerCase() === 'warning' ? 'bg-yellow-500' :
-            'bg-gray-500'
-          }`}
-        />
+       
       </div>
 
       {/* Tooltip */}

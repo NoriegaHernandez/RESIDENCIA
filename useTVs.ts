@@ -1,27 +1,8 @@
 import { useState, useEffect } from 'react';
-import { tvsApi } from '../lib/supabase';
+import { tvsApi, TV } from '../lib/api';
 
-export interface TV {
-  id: string;
-  floor_plan_id: string;
-  name: string;
-  model: string;
-  size: string;
-  type: string;
-  status: string;
-  x_position: number;
-  y_position: number;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface TVFormData {
-  name: string;
-  model: string;
-  size: string;
-  type: string;
-  status: string;
-}
+export type { TV };
+export type TVFormData = Pick<TV, 'name' | 'model' | 'size' | 'type' | 'status'>;
 
 export function useTVs(floorPlanId: string | null) {
   const [tvs, setTVs] = useState<TV[]>([]);
@@ -29,16 +10,11 @@ export function useTVs(floorPlanId: string | null) {
   const [error, setError] = useState<string | null>(null);
 
   const fetchTVs = async () => {
-    if (!floorPlanId) {
-      setTVs([]);
-      setLoading(false);
-      return;
-    }
-
+    if (!floorPlanId) { setTVs([]); setLoading(false); return; }
     try {
       setLoading(true);
       const data = await tvsApi.getByFloorPlan(floorPlanId);
-      setTVs(data || []);
+      setTVs(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch TVs');
     } finally {
@@ -48,19 +24,12 @@ export function useTVs(floorPlanId: string | null) {
 
   const createTV = async (x: number, y: number) => {
     if (!floorPlanId) return null;
-
     try {
       const data = await tvsApi.create({
         floor_plan_id: floorPlanId,
-        name: 'New TV',
-        model: '',
-        size: '55"',
-        type: 'LED',
-        status: 'Online',
-        x_position: x,
-        y_position: y
+        name: 'New TV', model: '', size: '55"',
+        type: 'LED', status: 'Online', x_position: x, y_position: y,
       });
-
       setTVs(prev => [...prev, data]);
       return data;
     } catch (err) {
@@ -72,7 +41,6 @@ export function useTVs(floorPlanId: string | null) {
   const updateTV = async (id: string, updates: Partial<TV>) => {
     try {
       const data = await tvsApi.update(id, updates);
-
       setTVs(prev => prev.map(t => t.id === id ? data : t));
       return data;
     } catch (err) {
@@ -84,7 +52,6 @@ export function useTVs(floorPlanId: string | null) {
   const deleteTV = async (id: string) => {
     try {
       await tvsApi.delete(id);
-
       setTVs(prev => prev.filter(t => t.id !== id));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete TV');
@@ -92,17 +59,7 @@ export function useTVs(floorPlanId: string | null) {
     }
   };
 
-  useEffect(() => {
-    fetchTVs();
-  }, [floorPlanId]);
+  useEffect(() => { fetchTVs(); }, [floorPlanId]);
 
-  return {
-    tvs,
-    loading,
-    error,
-    createTV,
-    updateTV,
-    deleteTV,
-    refetch: fetchTVs
-  };
+  return { tvs, loading, error, createTV, updateTV, deleteTV, refetch: fetchTVs };
 }
